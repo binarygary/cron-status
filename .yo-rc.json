@@ -1,0 +1,19 @@
+{
+  "generator-plugin-wp": {
+    "name": "Cron Status",
+    "homepage": "https://binarygary.com",
+    "description": "Let's just keep a log of recent cron calls.",
+    "version": "0.1.0",
+    "author": "Gary kovar",
+    "authoremail": "plugins@binarygary.com",
+    "authorurl": "https://binarygary.com",
+    "license": "GPLv2",
+    "slug": "cron-status",
+    "classname": "Cron_Status",
+    "mainclassname": "Cron_Status",
+    "classprefix": "CS_",
+    "prefix": "cron_status",
+    "year": 2017,
+    "currentVersionWP": "4.7.2"
+  }
+}
