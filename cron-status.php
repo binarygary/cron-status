@@ -115,6 +115,14 @@ final class Cron_Status {
 	protected static $single_instance = null;
 
 	/**
+	 * Instance of CS_Log
+	 *
+	 * @since0.1.0
+	 * @var CS_Log
+	 */
+	protected $log;
+
+	/**
 	 * Creates or returns an instance of this class.
 	 *
 	 * @since   0.1.0
@@ -145,8 +153,8 @@ final class Cron_Status {
 	 * @since  0.1.0
 	 */
 	public function plugin_classes() {
-		// $this->plugin_class = new CS_Plugin_Class( $this );
 
+		$this->log = new CS_Log( $this );
 	} // END OF PLUGIN CLASSES FUNCTION
 
 	/**
@@ -302,6 +310,7 @@ final class Cron_Status {
 			case 'basename':
 			case 'url':
 			case 'path':
+			case 'log':
 				return $this->$field;
 			default:
 				throw new Exception( 'Invalid ' . __CLASS__ . ' property: ' . $field );
