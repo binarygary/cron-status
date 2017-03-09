@@ -212,8 +212,14 @@ final class Cron_Status {
 		// Load translated strings for plugin.
 		load_plugin_textdomain( 'cron-status', false, dirname( $this->basename ) . '/languages/' );
 
-		// Add new minute schedule
+		// Add new minute schedule.
 		add_filter( 'cron_schedules', array( $this, 'add_minute_frequency' ) );
+
+		// Schedule the hook.
+		add_action( 'init', array( $this, 'schedule_logging' ) );
+
+		// Add the callback hook for logging.
+		add_action( 'cron_stat_enable_logging', array( $this, 'cron_stat_exec_logging' ) );
 
 		// Initialize plugin classes.
 		$this->plugin_classes();
@@ -387,6 +393,37 @@ final class Cron_Status {
 		);
 
 		return $schedules;
+	}
+
+	/**
+	 * If we haven't already scheduled the thing, we should.
+	 */
+	public function schedule_logging() {
+		if ( ! wp_next_scheduled( 'cron_stat_enable_logging' ) ) {
+			wp_schedule_event( time(), 'cron_stat_every_minute', 'cron_stat_enable_logging' );
+		}
+	}
+
+	/**
+	 * Actually store the cron data.
+	 */
+	public function cron_stat_exec_logging() {
+
+		$time = time();
+
+		$crons = get_option( 'cron_stats' );
+		if ( is_array( $crons ) ) {
+			$crons[ $time ] = $_SERVER;
+			foreach ( $crons as $logtime => $value ) {
+				if ( $logtime < $time - 86400 ) {
+					unset( $crons[ $logtime ] );
+				}
+			}
+		} else {
+			$crons = array();
+		}
+
+		update_option( 'cron_stats', $crons, false );
 	}
 }
 
