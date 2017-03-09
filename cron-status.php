@@ -42,6 +42,7 @@
  * Autoloads files with classes when needed.
  *
  * @since  0.1.0
+ *
  * @param  string $class_name Name of the class being requested.
  */
 function cron_status_autoload_classes( $class_name ) {
@@ -57,6 +58,7 @@ function cron_status_autoload_classes( $class_name ) {
 	// Include our file.
 	Cron_Status::include_file( 'includes/class-' . $filename );
 }
+
 spl_autoload_register( 'cron_status_autoload_classes' );
 
 /**
@@ -210,6 +212,9 @@ final class Cron_Status {
 		// Load translated strings for plugin.
 		load_plugin_textdomain( 'cron-status', false, dirname( $this->basename ) . '/languages/' );
 
+		// Add new minute schedule
+		add_filter( 'cron_schedules', array( $this, 'add_minute_frequency' ) );
+
 		// Initialize plugin classes.
 		$this->plugin_classes();
 	}
@@ -300,6 +305,7 @@ final class Cron_Status {
 	 * @since  0.1.0
 	 *
 	 * @param  string $field Field to get.
+	 *
 	 * @throws Exception     Throws an exception if the field is invalid.
 	 * @return mixed         Value of the field.
 	 */
@@ -323,6 +329,7 @@ final class Cron_Status {
 	 * @since  0.1.0
 	 *
 	 * @param  string $filename Name of the file to be included.
+	 *
 	 * @return boolean          Result of include call.
 	 */
 	public static function include_file( $filename ) {
@@ -330,6 +337,7 @@ final class Cron_Status {
 		if ( file_exists( $file ) ) {
 			return include_once( $file );
 		}
+
 		return false;
 	}
 
@@ -339,11 +347,13 @@ final class Cron_Status {
 	 * @since  0.1.0
 	 *
 	 * @param  string $path (optional) appended path.
+	 *
 	 * @return string       Directory and path.
 	 */
 	public static function dir( $path = '' ) {
 		static $dir;
 		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
+
 		return $dir . $path;
 	}
 
@@ -353,12 +363,30 @@ final class Cron_Status {
 	 * @since  0.1.0
 	 *
 	 * @param  string $path (optional) appended path.
+	 *
 	 * @return string       URL and path.
 	 */
 	public static function url( $path = '' ) {
 		static $url;
 		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
+
 		return $url . $path;
+	}
+
+	/**
+	 * Adds a new recurrence option of once every minute.
+	 *
+	 * @param array $schedules Current schedules.
+	 *
+	 * @return array Updated list of schedules.
+	 */
+	public function add_minute_frequency( $schedules ) {
+		$schedules['cron_stat_every_minute'] = array(
+			'interval' => 60,
+			'display'  => esc_html__( 'Every Minute' ),
+		);
+
+		return $schedules;
 	}
 }
 
